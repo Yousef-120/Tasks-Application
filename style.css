@@ -1,0 +1,388 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+body {
+  height: 100vh;
+  font-family: "Barlow", sans-serif;
+}
+.tasks-container {
+  height: 80vh;
+
+  .content {
+    background: #fffffc;
+    border: solid #bbd0ff 5px;
+    height: 60%;
+    .sections {
+      border-right: 2px solid #6c757d80;
+      width: 30%;
+      height: 100%;
+      .buttons {
+        padding: 32px 0 0 30px;
+        .section-btn {
+          font-style: Medium;
+          font-size: 20px;
+          line-height: 100%;
+          letter-spacing: 0%;
+          text-transform: capitalize;
+          padding: 13px 16px;
+          color: #25292c;
+          background-color: transparent;
+
+          border: none;
+          width: 100%;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+        .active {
+          color: #1576d6;
+          background: #f8f9facc;
+        }
+      }
+    }
+    .tasks {
+      width: 70%;
+      position: relative;
+      overflow-y: scroll;
+      scrollbar-width: none;
+      height: 100%;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      .top {
+        position: sticky;
+        top: 0;
+        background: #fffffc;
+        z-index: 1000;
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 12px 42px 12px 42px;
+        border-top-right-radius: 32px;
+        h3 {
+          font-size: 40px;
+          line-height: 100%;
+          letter-spacing: 0%;
+          text-transform: capitalize;
+        }
+        .add-task {
+          border: #00b4d8 2px solid !important;
+          border-radius: 10px;
+          gap: 14px;
+          padding: 10.5px 16px;
+          transition: all 0.3s ease;
+          span,
+          i {
+            transition: color 0.3s ease;
+          }
+          span {
+            color: #25292c;
+            line-height: 100%;
+            letter-spacing: 0%;
+            text-transform: capitalize;
+          }
+          i {
+            color: #00b4d8;
+            font-size: 18px;
+          }
+          &:hover {
+            background-color: #00b4d8;
+            span {
+              color: #ffffff;
+            }
+
+            i {
+              color: #ffffff;
+            }
+          }
+        }
+        .add-task-mobile {
+          border: #00b4d8 2px solid !important;
+          border-radius: 10px;
+          gap: 14px;
+          padding: 10.5px 16px;
+          transition: all 0.3s ease;
+          span,
+          i {
+            transition: color 0.3s ease;
+          }
+          span {
+            color: #25292c;
+            line-height: 100%;
+            letter-spacing: 0%;
+            text-transform: capitalize;
+          }
+          i {
+            color: #00b4d8;
+            font-size: 18px;
+          }
+          &:hover {
+            background-color: #00b4d8;
+            span {
+              color: #ffffff;
+            }
+
+            i {
+              color: #ffffff;
+            }
+          }
+        }
+        .delete-task,
+        .add-task,
+        .add-task-mobile,
+        .edit-task {
+          gap: 14px;
+        }
+      }
+      .bottom {
+        margin-top: 22px;
+        padding: 0px 42px 32px 42px;
+        .disabled {
+          pointer-events: none;
+          opacity: 0;
+        }
+        .close i {
+          cursor: pointer;
+        }
+        .task {
+          border: 1px solid #bbd0ff;
+          border-radius: 15px;
+          padding: 10px;
+          transition: transform 0.3s ease-in-out;
+          cursor: pointer;
+
+          .task-info {
+            h4 {
+              font-size: 18px;
+              line-height: 100%;
+              letter-spacing: 0%;
+              color: #25292c;
+            }
+            p {
+              color: #6c757d;
+              font-size: 12px;
+              line-height: 100%;
+              letter-spacing: 0%;
+            }
+          }
+          .checkbox-wrapper {
+            position: relative;
+            width: 26px;
+            height: 26px;
+            .checkbox {
+              appearance: none;
+
+              border-radius: 50%;
+              width: 100%;
+              height: 100%;
+              cursor: pointer;
+              border: 2px solid #00b4d8;
+              &:checked {
+                background-color: #00b4d8;
+              }
+            }
+            i {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: white;
+              font-size: 16px;
+              pointer-events: none;
+              opacity: 0;
+              transition: 0.3s ease;
+            }
+
+            .checkbox:checked + i {
+              opacity: 1;
+            }
+          }
+        }
+
+        .hover {
+          transform: scale(1.05);
+          transition: transform 0.3s ease-in-out;
+          animation: rotate 0.4s infinite ease-in-out;
+        }
+      }
+      .end {
+        position: absolute;
+        bottom: 0;
+        background: #fffffc;
+        z-index: 1000;
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 12px 42px 12px 42px;
+        border-bottom-right-radius: 32px;
+      }
+    }
+  }
+  @media screen and (max-width: 767px) {
+    height: 85vh;
+    padding: 0;
+    .content {
+      border: none;
+      .sections {
+        width: 100%;
+        border: none;
+        height: auto;
+        padding: 0 16px;
+        .buttons {
+          display: flex;
+          padding: 0 0 0 0;
+          .section-btn {
+            width: auto;
+            border-radius: 0;
+            border-bottom: 2px solid transparent;
+          }
+          .active {
+            border-bottom: 2px solid #00b4d8;
+            background: transparent;
+            color: #00b4d8;
+          }
+        }
+        .add-task {
+          color: #00b4d8 !important;
+          font-size: 22px;
+          border: none;
+          padding: 0;
+        }
+      }
+      .line {
+        height: 2px;
+        background-color: #6c757d80;
+      }
+      .tasks {
+        width: 100%;
+        height: auto;
+        .bottom {
+          padding: 0 16px 32px 16px;
+          .task {
+            &:hover {
+              transform: scale(1);
+            }
+          }
+        }
+      }
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 992px) {
+    padding: 0;
+    .content {
+      .sections {
+        .buttons {
+          padding: 32px 0 0 20px;
+        }
+      }
+      .tasks {
+        .top {
+          padding: 12px 22px;
+        }
+        .bottom {
+          padding: 12px 22px;
+          .task {
+            &:hover {
+              transform: scale(1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@keyframes rotate {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  25% {
+    transform: rotateZ(2deg);
+  }
+  50% {
+    transform: rotateZ(-2deg);
+  }
+  75% {
+    transform: rotateZ(2deg);
+  }
+  100% {
+    transform: rotateZ(0deg);
+  }
+}
+
+.add-task-modal {
+  border-radius: 15px;
+  padding: 35px;
+  background-color: #fffffc;
+
+  h2 {
+    font-weight: 600;
+    font-size: 25px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-transform: capitalize;
+  }
+
+  .task-input {
+    border: 1px solid #bbd0ff;
+    padding: 14px 16px;
+    border-radius: 15px;
+    font-size: 16px;
+  }
+
+  .buttons-div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+
+    button {
+      padding: 13px 39.5px;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 100%;
+      letter-spacing: 0%;
+      text-transform: capitalize;
+    }
+
+    .confirm-btn {
+      color: #f8f9fa;
+      background-color: #00b4d8;
+      border: none;
+    }
+
+    .cancel-btn {
+      border: 1px solid #00000040;
+    }
+  }
+}
+.alert-container {
+  height: 10vh;
+
+  @media screen and (max-width: 767px) {
+    position: sticky;
+    top: 0;
+  }
+}
+.alert {
+  width: fit-content;
+  height: fit-content;
+  cursor: pointer;
+}
+.bi {
+  width: 24px;
+  height: 24px;
+}
+.close-states {
+  button {
+    border: none;
+    outline: none;
+    font-size: 28px;
+  }
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+.action-ico
+{
+  @media screen and (max-width:430px) {
+    display: none;
+  }
+}
