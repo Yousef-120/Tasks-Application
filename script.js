@@ -21,32 +21,38 @@ let deleteState = false;
 let editState = false;
 let selectedSection;
 const notyf = new Notyf({
-  duration: 5000,
+  duration: 4000,
   position: { x: "center", y: "top" },
   dismissible: true,
   ripple: true,
 });
-Swal.fire({
-  title: "Enter Your Name",
-  input: "text",
-  inputLabel: "User Name",
-  inputPlaceholder: "Enter your name...",
-  showCancelButton: false,
-  confirmButtonText: "Next",
-  allowOutsideClick: false,
-  allowEscapeKey: false,
-  allowEnterKey: true,
-  inputValidator: (value) => {
-    if (!value.trim()) {
-      return "Name cannot be empty!";
+if (sessionStorage.getItem("userName")) {
+  notyf.success(`Hello ${sessionStorage.getItem("userName")}`);
+} else {
+  Swal.fire({
+    title: "Enter Your Name",
+    input: "text",
+    inputLabel: "User Name",
+    inputPlaceholder: "Enter your name...",
+    showCancelButton: false,
+    confirmButtonText: "Next",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    allowEnterKey: true,
+    inputValidator: (value) => {
+      if (!value.trim()) {
+        return "Name cannot be empty!";
+      }
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let userName = result.value.trim();
+      notyf.success(`Hello ${userName}`);
+      sessionStorage.setItem("userName", userName);
     }
-  },
-}).then((result) => {
-  if (result.isConfirmed) {
-    let userName = result.value.trim();
-    notyf.success(`Hello ${userName}`);
-  }
-});
+  });
+}
+
 if (tasksDB.length !== 0) {
   deleteBtn = document.querySelectorAll(".deleteBtn");
   editBtn = document.querySelectorAll(".editBtn");
@@ -60,7 +66,11 @@ function generateId() {
   } while (tasksDB.some((el) => el.id === id));
   return id;
 }
-
+addTaskBtn.forEach((e) => {
+  e.addEventListener("click", () => {
+    notyf.dismissAll();
+  });
+});
 deleteTaskBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
     if (tasksDB.length != 0) {
@@ -243,7 +253,6 @@ let renderTasks = (tasksType) => {
 };
 
 let addTask = () => {
-  console.log("d");
   taskState = false;
   let taskName = input.value.trim();
   input.value = "";

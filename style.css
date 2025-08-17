@@ -306,6 +306,7 @@ body {
 }
 
 .add-task-modal {
+  z-index: 99999;
   border-radius: 15px;
   padding: 35px;
   background-color: #fffffc;
