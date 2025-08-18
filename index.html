@@ -11,14 +11,9 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="alert-container container justify-content-center d-flex pt-4 mb-3 position-sticky top-0">
-      <div class="alert alert-primary text-white align-items-center mb-0 animate__animated animate__fadeInDown d-none border-0" role="alert" onclick="closeAlert()">
-        <i class="fa-solid fs-5 me-2"></i>
-      </div>
-    </div>
-
-    <div class="tasks-container container d-flex justify-content-center align-items-center col-12">
-      <div class="content rounded-5 col-12 col-lg-11 d-flex h-100 flex-column flex-md-row">
+   
+    <div class="tasks-container container d-flex justify-content-center align-items-center col-12 h-100">
+      <div class="content rounded-5 col-12 col-lg-11 h-75 d-flex flex-column flex-md-row">
         <div class="sections d-flex justify-content-between align-items-center d-md-block">
           <div class="buttons">
             <button onclick="activeToggle(0)" class="section-btn text-start fw-medium mb-0 mb-md-2 text-center text-md-start">All</button>
@@ -66,27 +61,6 @@
         </div>
       </div>
     </div>
-
-    <!-- <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content add-task-modal">
-          <div class="modal-header border-0 mb-4 p-0">
-            <h2 class="modal-title" id="staticBackdropLabel">Add New Task</h2>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <div class="modal-body p-0">
-            <input type="text" class="form-control task-input" placeholder="Type new task here" />
-          </div>
-
-          <div class="modal-footer buttons-div border-0 mt-4 p-0">
-            <button type="button" class="btn btn-outline-dark cancel-btn m-0" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-            <button type="button" class="btn confirm-btn m-0" onclick="addTask()" data-bs-dismiss="modal" aria-label="Close">Confirm</button>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

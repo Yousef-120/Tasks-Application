@@ -1,92 +1,24 @@
 let buttons = document.querySelectorAll(`.section-btn`);
 let input = document.querySelector(`.task-input`);
 let tasks = document.querySelector(`.content .bottom`);
-let alert = document.querySelector(`.alert`);
 let deleteTaskBtn = document.querySelectorAll(".main-delete-task");
 let closeStatesBtn = document.querySelector(".close-states");
 let addTaskBtn = document.querySelectorAll(".add-task");
 let sectionBtn = document.querySelectorAll(".section-btn");
 let editTaskBtn = document.querySelectorAll(".edit-task");
-let alertIco = document.querySelector(`.alert i`);
-let msg = document.createElement("div");
-let confirmDelete = document.querySelector(`.confirm-delete`);
 let deleteBtn;
 let checkBoxs;
 let tasksDB = JSON.parse(localStorage.getItem("tasksDB")) || [];
 let taskState;
-let alertTimeout;
-alert.appendChild(msg);
-buttons[0].classList.add(`active`);
 let deleteState = false;
 let editState = false;
 let selectedSection;
-const notyf = new Notyf({
-  duration: 4000,
-  position: { x: "center", y: "top" },
-  dismissible: true,
-  ripple: true,
-});
-if (sessionStorage.getItem("userName")) {
-  notyf.success(`Hello ${sessionStorage.getItem("userName")}`);
-} else {
-  Swal.fire({
-    title: "Enter Your Name",
-    input: "text",
-    inputLabel: "User Name",
-    inputPlaceholder: "Enter your name...",
-    showCancelButton: false,
-    confirmButtonText: "Next",
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    allowEnterKey: true,
-    inputValidator: (value) => {
-      if (!value.trim()) {
-        return "Name cannot be empty!";
-      }
-    },
-  }).then((result) => {
-    if (result.isConfirmed) {
-      let userName = result.value.trim();
-      notyf.success(`Hello ${userName}`);
-      sessionStorage.setItem("userName", userName);
-    }
-  });
-}
-
-if (tasksDB.length !== 0) {
-  deleteBtn = document.querySelectorAll(".deleteBtn");
-  editBtn = document.querySelectorAll(".editBtn");
-  checkBoxs = document.querySelectorAll(".checkbox-wrapper");
-}
-
-function formatTaskDate(taskDate) {
-  let date = moment(taskDate);
-  let now = moment();
-
-  if (date.isSame(now, "day")) {
-    return `Today at ${date.format("h:mm A")}`;
-  } else if (date.isSame(moment().subtract(1, "day"), "day")) {
-    return `Yesterday at ${date.format("h:mm A")}`;
-  } else if (date.isSame(moment().add(1, "day"), "day")) {
-    return `Tomorrow at ${date.format("h:mm A")}`;
-  } else {
-    // هنا الصياغة النهائية بدون أي PMT
-    return date.format("dddd DD/MM/YYYY h:mm A");
-  }
-}
-
-function generateId() {
-  let id;
-  do {
-    id = Math.floor(1000000000 + Math.random() * 9000000000);
-  } while (tasksDB.some((el) => el.id === id));
-  return id;
-}
+let sayHello;
 
 addTaskBtn.forEach((e) => {
   e.addEventListener("click", () => {
-    notyf.dismissAll()
-    addTask()
+    sayHello.dismissAll();
+    addTask();
   });
 });
 
@@ -111,9 +43,10 @@ deleteTaskBtn.forEach((btn) => {
         text: "There are no tasks to delete.",
         icon: "info",
         confirmButtonText: "OK",
+        heightAuto: false,
       });
     }
-    renderTasks(tasksDB)
+    renderTasks(tasksDB);
   });
 });
 
@@ -138,13 +71,79 @@ editTaskBtn.forEach((btn) => {
         text: "There are no tasks to edit.",
         icon: "info",
         confirmButtonText: "OK",
+        heightAuto: false,
       });
     }
-    renderTasks(tasksDB)
+    renderTasks(tasksDB);
   });
 });
 
 let showData = () => {
+  sayHello = new Notyf({
+    duration: 4000,
+    position: { x: "center", y: "top" },
+    dismissible: true,
+    ripple: true,
+  });
+  buttons[0].classList.add(`active`);
+  if (!sessionStorage.getItem("userName")) {
+    Swal.fire({
+      title: "Enter Your Name",
+      input: "text",
+      inputLabel: "User Name",
+      inputPlaceholder: "Enter your name...",
+      showCancelButton: false,
+      confirmButtonText: "Confirm",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: true,
+      heightAuto: false,
+      inputValidator: (value) => {
+        if (!value.trim()) {
+          return "Name cannot be empty!";
+        }
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let userName = result.value.trim();
+        sayHello.success(`Hello ${userName}`);
+        sessionStorage.setItem("userName", userName);
+      }
+    });
+  }
+  if (tasksDB.length !== 0) {
+    deleteBtn = document.querySelectorAll(".deleteBtn");
+    editBtn = document.querySelectorAll(".editBtn");
+    checkBoxs = document.querySelectorAll(".checkbox-wrapper");
+  }
+  renderTasks(tasksDB);
+};
+
+let formatTaskDate = (taskDate) => {
+  let date = moment(taskDate);
+  let now = moment();
+
+  if (date.isSame(now, "day")) {
+    return `Today at ${date.format("h:mm A")}`;
+  } else if (date.isSame(moment().subtract(1, "day"), "day")) {
+    return `Yesterday at ${date.format("h:mm A")}`;
+  } else if (date.isSame(moment().add(1, "day"), "day")) {
+    return `Tomorrow at ${date.format("h:mm A")}`;
+  } else {
+    // هنا الصياغة النهائية بدون أي PMT
+    return date.format("dddd DD/MM/YYYY h:mm A");
+  }
+};
+
+let generateId = () => {
+  let id;
+  do {
+    id = Math.floor(1000000000 + Math.random() * 9000000000);
+  } while (tasksDB.some((el) => el.id === id));
+  return id;
+};
+
+let activateCheckboxs = () => {
   let checkbox = document.querySelectorAll(`.checkbox`);
   checkbox.forEach((el) => {
     let taskId = el.dataset.id;
@@ -250,7 +249,7 @@ let activeToggle = (index) => {
 };
 
 let renderTasks = (tasksType) => {
-  console.log(editState)
+  console.log(editState);
   let theResult;
   tasks.innerHTML = ``;
   tasksType.forEach((el) => {
@@ -267,11 +266,9 @@ let renderTasks = (tasksType) => {
       theResult = `<button data-id="${el.id}" class="editBtn btn text-dark border-2 rounded-2">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>`;
-    }
-    else
-    {
-      console.log("hrllo")
-      console.log(theResult)
+    } else {
+      console.log("hrllo");
+      console.log(theResult);
     }
     tasks.innerHTML += `
     <label class="task d-flex align-items-center justify-content-between">
@@ -286,7 +283,7 @@ let renderTasks = (tasksType) => {
   editBtn = document.querySelectorAll(".editBtn");
   checkBoxs = document.querySelectorAll(".checkbox-wrapper");
   checkState();
-  showData();
+  activateCheckboxs();
   deleteBtn.forEach((btn) => {
     btn.addEventListener("click", () => {
       deleteTask(btn.dataset.id);
@@ -310,6 +307,7 @@ let addTask = () => {
     showCancelButton: true,
     confirmButtonText: "Add",
     cancelButtonText: "Cancel",
+    heightAuto: false,
     inputValidator: (value) => {
       if (!value.trim()) {
         return "Task name cannot be empty!";
@@ -340,6 +338,7 @@ let addTask = () => {
         icon: "success",
         timer: 1500,
         showConfirmButton: false,
+        heightAuto: false,
       });
     }
   });
@@ -370,6 +369,7 @@ let deleteTask = (taskId) => {
     confirmButtonColor: "#3085d6",
     cancelButtonColor: "#d33",
     confirmButtonText: "Yes, delete it!",
+    heightAuto: false,
   }).then((result) => {
     if (result.isConfirmed) {
       tasksDB.splice(selectedIndexToDel, 1);
@@ -379,6 +379,7 @@ let deleteTask = (taskId) => {
         title: "Deleted!",
         text: "The task has been deleted.",
         icon: "success",
+        heightAuto: false,
       }).then(() => {
         if (tasksDB.length === 0) {
           closeStates();
@@ -400,6 +401,7 @@ let editTask = (taskId) => {
     showCancelButton: true,
     confirmButtonText: "Save",
     cancelButtonText: "Cancel",
+    heightAuto: false,
     inputValidator: (value) => {
       let isExists = tasksDB.some((el) => value === el.TaskName);
       if (currentTask.TaskName === value) {
@@ -418,9 +420,13 @@ let editTask = (taskId) => {
       };
       localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
       renderTasks(tasksDB);
-      Swal.fire("Updated!", "Task has been updated successfully.", "success");
+      Swal.fire({
+        title: "Updated!",
+        text: "Task has been updated successfully.",
+        icon: "success",
+        heightAuto: false,
+      });
     }
   });
 };
-
-renderTasks(tasksDB);
+showData();
