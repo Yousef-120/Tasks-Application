@@ -306,7 +306,6 @@ body {
 }
 
 .add-task-modal {
-  z-index: 99999;
   border-radius: 15px;
   padding: 35px;
   background-color: #fffffc;
@@ -386,4 +385,11 @@ body {
   @media screen and (max-width:430px) {
     display: none;
   }
+}
+.modal {
+  z-index: 999999 !important;
+}
+
+.modal-backdrop {
+  z-index: 2000 !important;
 }

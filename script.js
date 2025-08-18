@@ -59,6 +59,22 @@ if (tasksDB.length !== 0) {
   checkBoxs = document.querySelectorAll(".checkbox-wrapper");
 }
 
+function formatTaskDate(taskDate) {
+  let date = moment(taskDate);
+  let now = moment();
+
+  if (date.isSame(now, "day")) {
+    return `Today at ${date.format("h:mm A")}`;
+  } else if (date.isSame(moment().subtract(1, "day"), "day")) {
+    return `Yesterday at ${date.format("h:mm A")}`;
+  } else if (date.isSame(moment().add(1, "day"), "day")) {
+    return `Tomorrow at ${date.format("h:mm A")}`;
+  } else {
+    // هنا الصياغة النهائية بدون أي PMT
+    return date.format("dddd DD/MM/YYYY h:mm A");
+  }
+}
+
 function generateId() {
   let id;
   do {
@@ -66,11 +82,13 @@ function generateId() {
   } while (tasksDB.some((el) => el.id === id));
   return id;
 }
+
 addTaskBtn.forEach((e) => {
   e.addEventListener("click", () => {
     notyf.dismissAll();
   });
 });
+
 deleteTaskBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
     if (tasksDB.length != 0) {
@@ -80,6 +98,7 @@ deleteTaskBtn.forEach((btn) => {
         checkBoxs.forEach((el) => el.classList.add("d-none"));
         closeStatesBtn.classList.replace("d-none", "d-flex");
         addTaskBtn.forEach((el) => el.classList.add("disabled"));
+        editTaskBtn.forEach((el) => el.classList.add("disabled"));
         btn.classList.add("disabled");
         deleteState = true;
       } else {
@@ -106,6 +125,7 @@ editTaskBtn.forEach((btn) => {
         closeStatesBtn.classList.replace("d-none", "d-flex");
         btn.classList.add("disabled");
         deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
+        addTaskBtn.forEach((el) => el.classList.add("disabled"));
         editState = true;
       } else {
         closeStates();
@@ -195,7 +215,14 @@ let activeToggle = (index) => {
   buttons.forEach((el) => el.classList.remove(`active`));
   buttons[index].classList.add(`active`);
   selectedSection = index;
-  if (index == 0) {
+  if (index === 1 || index === 2) {
+    addTaskBtn.forEach((el) => el.classList.add("disabled"));
+    editTaskBtn.forEach((el) => el.classList.add("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
+  } else if (index == 0) {
+    addTaskBtn.forEach((el) => el.classList.remove("disabled"));
+    editTaskBtn.forEach((el) => el.classList.remove("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.remove("disabled"));
     renderTasks(tasksDB);
   } else if (index === 1) {
     let completedTasks = tasksDB.filter((el) => el.TaskState === false);
@@ -272,7 +299,8 @@ let addTask = () => {
       confirmButtonText: "OK",
     });
   } else {
-    let newTask = { id: generateId(), TaskName: taskName, TaskTime: "17/8", TaskState: taskState };
+    let taskMoment = moment();
+    let newTask = { id: generateId(), TaskName: taskName, TaskTime: formatTaskDate(taskMoment), TaskState: taskState };
     tasksDB.push(newTask);
     localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
     renderTasks(tasksDB);
@@ -302,6 +330,7 @@ let closeStates = () => {
 
 let deleteTask = (taskId) => {
   let selectedIndexToDel = tasksDB.findIndex((el) => el.id == taskId);
+
   Swal.fire({
     title: "Are you sure?",
     text: "You won't be able to revert this!",
@@ -314,11 +343,15 @@ let deleteTask = (taskId) => {
     if (result.isConfirmed) {
       tasksDB.splice(selectedIndexToDel, 1);
       localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
-      closeStates();
+      renderTasks(tasksDB);
       Swal.fire({
         title: "Deleted!",
         text: "The task has been deleted.",
         icon: "success",
+      }).then(() => {
+        if (tasksDB.length === 0) {
+          closeStates();
+        }
       });
     }
   });
@@ -353,9 +386,12 @@ let editTask = (taskId) => {
         TaskName: result.value.trim(),
       };
       localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
-      activeToggle(selectedSection);
-      Swal.fire("Updated!", "Task has been updated successfully.", "success");
-      closeStates();
+      renderTasks(tasksDB);
+      Swal.fire("Updated!", "Task has been updated successfully.", "success").then(() => {
+        if (tasksDB.length === 0) {
+          closeStates();
+        }
+      });
     }
   });
 };
