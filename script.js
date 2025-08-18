@@ -85,7 +85,8 @@ function generateId() {
 
 addTaskBtn.forEach((e) => {
   e.addEventListener("click", () => {
-    notyf.dismissAll();
+    notyf.dismissAll()
+    addTask()
   });
 });
 
@@ -112,6 +113,7 @@ deleteTaskBtn.forEach((btn) => {
         confirmButtonText: "OK",
       });
     }
+    renderTasks(tasksDB)
   });
 });
 
@@ -138,6 +140,7 @@ editTaskBtn.forEach((btn) => {
         confirmButtonText: "OK",
       });
     }
+    renderTasks(tasksDB)
   });
 });
 
@@ -162,7 +165,7 @@ let checkState = () => {
         tasksDB[taskIndex].TaskState = el.checked;
         localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
         setTimeout(() => {
-          activeToggle(selectedSection);
+          activeToggle(0);
         }, 500);
       }
     });
@@ -215,16 +218,17 @@ let activeToggle = (index) => {
   buttons.forEach((el) => el.classList.remove(`active`));
   buttons[index].classList.add(`active`);
   selectedSection = index;
-  if (index === 1 || index === 2) {
-    addTaskBtn.forEach((el) => el.classList.add("disabled"));
-    editTaskBtn.forEach((el) => el.classList.add("disabled"));
-    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
-  } else if (index == 0) {
+  if (index == 0) {
     addTaskBtn.forEach((el) => el.classList.remove("disabled"));
     editTaskBtn.forEach((el) => el.classList.remove("disabled"));
     deleteTaskBtn.forEach((el) => el.classList.remove("disabled"));
+
     renderTasks(tasksDB);
   } else if (index === 1) {
+    addTaskBtn.forEach((el) => el.classList.add("disabled"));
+    editTaskBtn.forEach((el) => el.classList.add("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
+
     let completedTasks = tasksDB.filter((el) => el.TaskState === false);
     if (completedTasks != []) {
       renderTasks(completedTasks);
@@ -232,6 +236,10 @@ let activeToggle = (index) => {
       return false;
     }
   } else if (index === 2) {
+    addTaskBtn.forEach((el) => el.classList.add("disabled"));
+    editTaskBtn.forEach((el) => el.classList.add("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
+
     let notCompletedTasks = tasksDB.filter((el) => el.TaskState === true);
     if (notCompletedTasks != []) {
       renderTasks(notCompletedTasks);
@@ -242,24 +250,36 @@ let activeToggle = (index) => {
 };
 
 let renderTasks = (tasksType) => {
+  console.log(editState)
+  let theResult;
   tasks.innerHTML = ``;
   tasksType.forEach((el) => {
+    if (deleteState != true && editState != true) {
+      theResult = ` <div class="checkbox-wrapper">
+        <input data-id="${el.id}" type="checkbox" class="checkbox"/> 
+        <i class="fa fa-check"></i>
+      </div>`;
+    } else if (deleteState == true) {
+      theResult = `<button data-id="${el.id}" class="deleteBtn btn text-danger border-2 rounded-2">
+        <i class="fa-solid fa-trash"></i>
+      </button>`;
+    } else if (editState == true) {
+      theResult = `<button data-id="${el.id}" class="editBtn btn text-dark border-2 rounded-2">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>`;
+    }
+    else
+    {
+      console.log("hrllo")
+      console.log(theResult)
+    }
     tasks.innerHTML += `
     <label class="task d-flex align-items-center justify-content-between">
       <div class="task-info">
         <h4 class="task-name fw-medium">${el.TaskName}</h4>
         <p class="task-time m-0">${el.TaskTime}</p>
       </div>
-      <div class="checkbox-wrapper">
-        <input data-id="${el.id}" type="checkbox" class="checkbox"/> 
-        <i class="fa fa-check"></i>
-      </div>
-      <button data-id="${el.id}" class="deleteBtn btn text-danger border-2 rounded-3 d-none">
-        <i class="fa-solid fa-trash"></i>
-      </button>
-      <button data-id="${el.id}" class="editBtn btn text-dark border-2 rounded-2 d-none">
-        <i class="fa-solid fa-pen-to-square"></i>
-      </button>
+      ${theResult}
     </label>`;
   });
   deleteBtn = document.querySelectorAll(".deleteBtn");
@@ -281,37 +301,48 @@ let renderTasks = (tasksType) => {
 
 let addTask = () => {
   taskState = false;
-  let taskName = input.value.trim();
-  input.value = "";
-  isExists = tasksDB.some((el) => el.TaskName.trim() === taskName);
-  if (isExists) {
-    Swal.fire({
-      title: "Duplicate Task!",
-      text: "A task with this name already exists. Please choose another name.",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-  } else if (!taskName) {
-    Swal.fire({
-      title: "Empty Task!",
-      text: "You must enter a task name.",
-      icon: "warning",
-      confirmButtonText: "OK",
-    });
-  } else {
-    let taskMoment = moment();
-    let newTask = { id: generateId(), TaskName: taskName, TaskTime: formatTaskDate(taskMoment), TaskState: taskState };
-    tasksDB.push(newTask);
-    localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
-    renderTasks(tasksDB);
-    Swal.fire({
-      title: "Task Added!",
-      text: "Your task has been successfully added.",
-      icon: "success",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  }
+
+  Swal.fire({
+    title: "Add New Task",
+    input: "text",
+    inputLabel: "Enter task name",
+    inputPlaceholder: "Task name...",
+    showCancelButton: true,
+    confirmButtonText: "Add",
+    cancelButtonText: "Cancel",
+    inputValidator: (value) => {
+      if (!value.trim()) {
+        return "Task name cannot be empty!";
+      }
+      let isExists = tasksDB.some((el) => el.TaskName.trim() === value.trim());
+      if (isExists) {
+        return "This task already exists!";
+      }
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let taskName = result.value.trim();
+      let taskMoment = moment();
+      let newTask = {
+        id: generateId(),
+        TaskName: taskName,
+        TaskTime: formatTaskDate(taskMoment),
+        TaskState: taskState,
+      };
+
+      tasksDB.push(newTask);
+      localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
+      renderTasks(tasksDB);
+
+      Swal.fire({
+        title: "Task Added!",
+        text: "Your task has been successfully added.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
+  });
 };
 
 let closeStates = () => {
@@ -387,11 +418,7 @@ let editTask = (taskId) => {
       };
       localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
       renderTasks(tasksDB);
-      Swal.fire("Updated!", "Task has been updated successfully.", "success").then(() => {
-        if (tasksDB.length === 0) {
-          closeStates();
-        }
-      });
+      Swal.fire("Updated!", "Task has been updated successfully.", "success");
     }
   });
 };
