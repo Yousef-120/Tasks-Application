@@ -15,69 +15,41 @@ let editState = false;
 let selectedSection;
 let sayHello;
 
-addTaskBtn.forEach((e) => {
-  e.addEventListener("click", () => {
-    sayHello.dismissAll();
-    addTask();
-  });
-});
+let filterTasksAsBtnType = () => {
+  let selectedBtnIndex = Array.from(buttons).findIndex((el) => el.classList.contains("active"));
 
-deleteTaskBtn.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (tasksDB.length != 0) {
-      if (deleteState === false) {
-        sectionBtn.forEach((el) => el.classList.add("disabled"));
-        deleteBtn.forEach((el) => el.classList.remove("d-none"));
-        checkBoxs.forEach((el) => el.classList.add("d-none"));
-        closeStatesBtn.classList.replace("d-none", "d-flex");
-        addTaskBtn.forEach((el) => el.classList.add("disabled"));
-        editTaskBtn.forEach((el) => el.classList.add("disabled"));
-        btn.classList.add("disabled");
-        deleteState = true;
-      } else {
-        closeStates();
-      }
-    } else {
-      Swal.fire({
-        title: "No Tasks Found",
-        text: "There are no tasks to delete.",
-        icon: "info",
-        confirmButtonText: "OK",
-        heightAuto: false,
-      });
-    }
+  if (selectedBtnIndex === 0) {
+    addTaskBtn.forEach((el) => el.classList.remove("disabled"));
+    editTaskBtn.forEach((el) => el.classList.remove("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.remove("disabled"));
+
     renderTasks(tasksDB);
-  });
-});
+  } else if (selectedBtnIndex === 1) {
+    addTaskBtn.forEach((el) => el.classList.add("disabled"));
+    editTaskBtn.forEach((el) => el.classList.add("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
 
-editTaskBtn.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (tasksDB.length != 0) {
-      if (editState === false) {
-        sectionBtn.forEach((el) => el.classList.add("disabled"));
-        editBtn.forEach((el) => el.classList.remove("d-none"));
-        checkBoxs.forEach((el) => el.classList.add("d-none"));
-        closeStatesBtn.classList.replace("d-none", "d-flex");
-        btn.classList.add("disabled");
-        deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
-        addTaskBtn.forEach((el) => el.classList.add("disabled"));
-        editState = true;
-      } else {
-        closeStates();
-      }
+    let completedTasks = tasksDB.filter((el) => el.TaskState === false);
+
+    if (completedTasks != []) {
+      renderTasks(completedTasks);
     } else {
-      Swal.fire({
-        title: "No Tasks Found",
-        text: "There are no tasks to edit.",
-        icon: "info",
-        confirmButtonText: "OK",
-        heightAuto: false,
-      });
+      return false;
     }
-    renderTasks(tasksDB);
-  });
-});
+  } else if (selectedBtnIndex === 2) {
+    addTaskBtn.forEach((el) => el.classList.add("disabled"));
+    editTaskBtn.forEach((el) => el.classList.add("disabled"));
+    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
 
+    let notCompletedTasks = tasksDB.filter((el) => el.TaskState === true);
+
+    if (notCompletedTasks != []) {
+      renderTasks(notCompletedTasks);
+    } else {
+      return false;
+    }
+  }
+};
 let showData = () => {
   sayHello = new Notyf({
     duration: 4000,
@@ -164,88 +136,11 @@ let checkState = () => {
         tasksDB[taskIndex].TaskState = el.checked;
         localStorage.setItem("tasksDB", JSON.stringify(tasksDB));
         setTimeout(() => {
-          activeToggle(0);
+          filterTasksAsBtnType();
         }, 500);
       }
     });
   });
-};
-
-let showAlert = (type, message) => {
-  closeAlert();
-  clearTimeout(alertTimeout);
-  alert.classList.remove("bg-success", "bg-danger", "bg-primary");
-  alertIco.classList.remove("fa-circle-check", "fa-circle-exclamation");
-  if (type === "success") {
-    alert.classList.add("bg-success");
-    alertIco.classList.add("fa-circle-check");
-  } else if (type === "warning") {
-    alert.classList.add("bg-primary");
-    alertIco.classList.add("fa-circle-exclamation");
-  } else if (type === "error") {
-    alert.classList.add("bg-danger");
-    alertIco.classList.add("fa-circle-exclamation");
-  }
-  msg.textContent = message;
-  alert.classList.remove("animate__fadeInDown", "animate__fadeOutUp");
-  setTimeout(() => {
-    alert.classList.remove("d-none");
-    alert.classList.add("d-flex", "animate__fadeInDown");
-  }, 10);
-  alertTimeout = setTimeout(() => {
-    alert.classList.remove("animate__fadeInDown");
-    alert.classList.add("animate__fadeOutUp");
-    setTimeout(() => {
-      alert.classList.remove("animate__fadeOutUp", "d-flex");
-      alert.classList.add("d-none");
-    }, 1000);
-  }, 6000);
-};
-
-let closeAlert = () => {
-  alertTimeout = setTimeout(() => {
-    alert.classList.remove("animate__fadeInDown");
-    alert.classList.add("animate__fadeOutUp");
-    setTimeout(() => {
-      alert.classList.remove("animate__fadeOutUp", "d-flex");
-      alert.classList.add("d-none");
-    }, 1000);
-  }, 100);
-};
-
-let activeToggle = (index) => {
-  buttons.forEach((el) => el.classList.remove(`active`));
-  buttons[index].classList.add(`active`);
-  selectedSection = index;
-  if (index == 0) {
-    addTaskBtn.forEach((el) => el.classList.remove("disabled"));
-    editTaskBtn.forEach((el) => el.classList.remove("disabled"));
-    deleteTaskBtn.forEach((el) => el.classList.remove("disabled"));
-
-    renderTasks(tasksDB);
-  } else if (index === 1) {
-    addTaskBtn.forEach((el) => el.classList.add("disabled"));
-    editTaskBtn.forEach((el) => el.classList.add("disabled"));
-    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
-
-    let completedTasks = tasksDB.filter((el) => el.TaskState === false);
-    if (completedTasks != []) {
-      renderTasks(completedTasks);
-    } else {
-      return false;
-    }
-  } else if (index === 2) {
-    addTaskBtn.forEach((el) => el.classList.add("disabled"));
-    editTaskBtn.forEach((el) => el.classList.add("disabled"));
-    deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
-
-    let notCompletedTasks = tasksDB.filter((el) => el.TaskState === true);
-    if (notCompletedTasks != []) {
-      renderTasks(notCompletedTasks);
-    } else {
-      return false;
-    }
-  }
 };
 
 let renderTasks = (tasksType) => {
@@ -429,4 +324,75 @@ let editTask = (taskId) => {
     }
   });
 };
+
+addTaskBtn.forEach((e) => {
+  e.addEventListener("click", () => {
+    sayHello.dismissAll();
+    addTask();
+  });
+});
+
+deleteTaskBtn.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (tasksDB.length != 0) {
+      if (deleteState === false) {
+        sectionBtn.forEach((el) => el.classList.add("disabled"));
+        deleteBtn.forEach((el) => el.classList.remove("d-none"));
+        checkBoxs.forEach((el) => el.classList.add("d-none"));
+        closeStatesBtn.classList.replace("d-none", "d-flex");
+        addTaskBtn.forEach((el) => el.classList.add("disabled"));
+        editTaskBtn.forEach((el) => el.classList.add("disabled"));
+        btn.classList.add("disabled");
+        deleteState = true;
+      } else {
+        closeStates();
+      }
+    } else {
+      Swal.fire({
+        title: "No Tasks Found",
+        text: "There are no tasks to delete.",
+        icon: "info",
+        confirmButtonText: "OK",
+        heightAuto: false,
+      });
+    }
+    renderTasks(tasksDB);
+  });
+});
+
+editTaskBtn.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (tasksDB.length != 0) {
+      if (editState === false) {
+        sectionBtn.forEach((el) => el.classList.add("disabled"));
+        editBtn.forEach((el) => el.classList.remove("d-none"));
+        checkBoxs.forEach((el) => el.classList.add("d-none"));
+        closeStatesBtn.classList.replace("d-none", "d-flex");
+        btn.classList.add("disabled");
+        deleteTaskBtn.forEach((el) => el.classList.add("disabled"));
+        addTaskBtn.forEach((el) => el.classList.add("disabled"));
+        editState = true;
+      } else {
+        closeStates();
+      }
+    } else {
+      Swal.fire({
+        title: "No Tasks Found",
+        text: "There are no tasks to edit.",
+        icon: "info",
+        confirmButtonText: "OK",
+        heightAuto: false,
+      });
+    }
+    renderTasks(tasksDB);
+  });
+});
+
+buttons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    buttons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    filterTasksAsBtnType();
+  });
+});
 showData();
